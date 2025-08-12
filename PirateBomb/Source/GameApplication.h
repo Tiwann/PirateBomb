@@ -2,6 +2,7 @@
 #include "Runtime/GameApplication.h"
 
 namespace Nova::Rendering { class Texture; }
+namespace Nova { class SpriteAnimation; struct SpriteSheet; }
 
 class GameApplication : public Nova::Application
 {
@@ -9,6 +10,8 @@ public:
 
     void OnInit() override;
     void OnUpdate(float deltaTime) override;
+    void OnGUI() override;
 
     Nova::Rendering::Texture* LoadTexture(const Nova::String& name, Nova::StringView filepath);
+    Nova::SpriteAnimation* LoadSpriteAnimation(const Nova::String& name, const Nova::SpriteSheet& spriteSheet);
 };
