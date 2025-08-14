@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Runtime/GameApplication.h"
+#include "Runtime/Application.h"
 
 namespace Nova::Rendering { class Texture; }
 namespace Nova { class SpriteAnimation; struct SpriteSheet; }
@@ -7,7 +7,7 @@ namespace Nova { class SpriteAnimation; struct SpriteSheet; }
 class GameApplication : public Nova::Application
 {
 public:
-
+    Nova::ApplicationConfiguration GetConfiguration() const override;
     void OnInit() override;
     void OnUpdate(float deltaTime) override;
     void OnGUI() override;

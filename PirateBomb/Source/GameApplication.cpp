@@ -2,33 +2,43 @@
 #include "Rendering/Texture.h"
 #include "Rendering/Vulkan/Texture.h"
 #include "Runtime/Path.h"
+#include "Components/Camera.h"
+#include "Components/Transform.h"
+#include "Components/Rendering/SpriteRenderer.h"
+#include "Runtime/SpriteAnimation.h"
+#include "Runtime/DesktopWindow.h"
+#include "Runtime/Scene.h"
+#include "ImGuiHelpers.h"
+#include "Runtime/EntryPoint.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "External/stb_image.h"
 
 #include <cstdint>
-
 #include <imgui.h>
-#include "Components/Camera.h"
-#include "Components/Transform.h"
-#include "Components/Rendering/SpriteRenderer.h"
-#include "Assets/SpriteAnimation.h"
-#include "Components/Rendering/SpriteAnimator.h"
-#include "Runtime/DesktopWindow.h"
-#include "Runtime/Scene.h"
 
 
-namespace Nova
-{
-    extern "C" Application* CreateApplication() { return new GameApplication(); }
-}
+NOVA_DEFINE_APPLICATION_CLASS(GameApplication)
 
 using namespace Nova;
 using namespace Nova::Rendering;
 
+static Transform* transform = nullptr;
 static SpriteRenderer* renderer = nullptr;
 static SpriteAnimation* playerIdleAnim = nullptr;
 static SpriteAnimation* playerRunAnim = nullptr;
+
+ApplicationConfiguration GameApplication::GetConfiguration() const
+{
+    ApplicationConfiguration config;
+    config.windowWidth = 800;
+    config.windowHeight = 600;
+    config.vsync = true;
+    config.applicationName = "Pirate Bomb";
+    config.fullscreen = false;
+    config.resizable = false;
+    return config;
+}
 
 void GameApplication::OnInit()
 {
@@ -49,10 +59,10 @@ void GameApplication::OnInit()
 
         Scene* scene = new Scene(this, "");
         EntityHandle entity = scene->CreateEntity("Sprite");
+        transform = entity->GetTransform();
         renderer = entity->AddComponent<SpriteRenderer>();
         renderer->SetPixelsPerUnit(58);
         renderer->SetSpriteAnimation(playerRunAnim);
-
 
         EntityHandle cameraEntity = scene->CreateEntity("Camera");
         cameraEntity->GetTransform()->SetPosition(Vector3(0.0f, 0.0f, 1.0f));
@@ -73,9 +83,10 @@ void GameApplication::OnInit()
 void GameApplication::OnUpdate(float deltaTime)
 {
     const auto& window = GetWindow().As<DesktopWindow>();
-    if (window->GetKeyDown(KeyCode::Escape))
+    if (window->GetKeyDown(KeyCode::Space))
     {
         static bool isA = false;
+        isA = !isA;
         if (isA)
         {
             renderer->SetSpriteAnimation(playerIdleAnim);
@@ -83,45 +94,18 @@ void GameApplication::OnUpdate(float deltaTime)
         {
             renderer->SetSpriteAnimation(playerRunAnim);
         }
-        isA = !isA;
     }
 }
 
-void DrawFpsCounter(const float deltaTime, const float rounding)
-{
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
 
-    constexpr ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoNav |
-        ImGuiWindowFlags_NoDecoration |
-        ImGuiWindowFlags_NoInputs |
-        ImGuiWindowFlags_AlwaysAutoResize;
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, rounding);
-    if (ImGui::Begin("FPS counter", nullptr, flags))
-    {
-        static char str[9] = "0000 fps";
-        static float timer = 0.0f;
-        timer += deltaTime;
-        if (timer > 0.5f)
-        {
-            const uint32_t fps = 1.0f / deltaTime;
-            std::format_to(str, "{:04} fps", fps);
-            timer = 0.0f;
-        }
-        ImGui::TextUnformatted(str, str + 9);
-    }
-    ImGui::End();
-    ImGui::PopStyleVar();
-}
 void GameApplication::OnGUI()
 {
-    //DrawFpsCounter(GetDeltaTime(), 5.0f);
+    DrawFps(GetDeltaTime(), 3.0f);
     if (ImGui::Begin("Settings"))
     {
-        int32_t speed = 1.0f / renderer->GetSpeed();
-        if (ImGui::SliderInt("Speed", &speed, 0, 120))
-            renderer->SetSpeed(speed);
+        DrawSpriteRenderer("Sprite Renderer", renderer);
+        DrawTransform("Transform", transform);
     }
     ImGui::End();
 }
