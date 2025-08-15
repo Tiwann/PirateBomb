@@ -2,10 +2,12 @@
 #include "Components/Transform.h"
 #include <imgui.h>
 
+#include "Components/Physics/BoxComponent2D.h"
 #include "Components/Rendering/SpriteRenderer.h"
 
 void DrawTransform(const Nova::StringView name, Nova::Transform* transform)
 {
+    if (!transform) return;
     ImGui::PushID(transform);
     if (ImGui::TreeNode(*name))
     {
@@ -57,6 +59,7 @@ void DrawFps(const float deltaTime, const float rounding)
 
 void DrawSpriteRenderer(const Nova::StringView name, Nova::SpriteRenderer* renderer)
 {
+    if (!renderer) return;
     ImGui::PushID(renderer);
     if (ImGui::TreeNode(*name))
     {
@@ -92,6 +95,29 @@ void DrawSpriteRenderer(const Nova::StringView name, Nova::SpriteRenderer* rende
         uint32_t pixelsPerUnit = renderer->GetPixelsPerUnit();
         if (ImGui::DragInt("Pixels Per Unit", (int*)&pixelsPerUnit, 1, 0, 0))
             renderer->SetPixelsPerUnit(pixelsPerUnit);
+
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+}
+
+void DrawBoxComponent(Nova::StringView name, Nova::BoxComponent2D* box)
+{
+    if (!box) return;
+    ImGui::PushID(box);
+    if (ImGui::TreeNode(*name))
+    {
+        Nova::Vector2 position = box->GetShapePosition();
+        if (ImGui::DragFloat2("Position", position.ValuePtr(), 0.01f, 0, 0, "%.2f"))
+            box->SetShapePosition(position);
+
+        Nova::Vector2 size = Nova::Vector2(box->GetWidth(), box->GetHeight());
+        if (ImGui::DragFloat2("Size", size.ValuePtr(), 0.01f, 0, 0, "%.2f"))
+            box->SetSize(size.x, size.y);
+
+        float rotation = Nova::Math::Degrees(box->GetShapeRotation());
+        if (ImGui::DragFloat("Rotation", &rotation, 0.01f, 0, 0, "%.2f"))
+            box->SetShapeRotation(Nova::Math::Radians(rotation));
 
         ImGui::TreePop();
     }

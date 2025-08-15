@@ -12,6 +12,6 @@ public:
     void OnUpdate(float deltaTime) override;
     void OnGUI() override;
 
-    Nova::Rendering::Texture* LoadTexture(const Nova::String& name, Nova::StringView filepath);
-    Nova::SpriteAnimation* LoadSpriteAnimation(const Nova::String& name, const Nova::SpriteSheet& spriteSheet);
+    Nova::Ref<Nova::Rendering::Texture> LoadTexture(const Nova::String& name, Nova::StringView filepath);
+    Nova::Ref<Nova::SpriteAnimation> LoadSpriteAnimation(const Nova::String& name, const Nova::SpriteSheet& spriteSheet);
 };
