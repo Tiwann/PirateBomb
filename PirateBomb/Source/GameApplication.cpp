@@ -12,15 +12,14 @@
 #include "Runtime/EntryPoint.h"
 #include "Components/Physics/BoxComponent2D.h"
 #include "Components/Physics/PlaneComponent2D.h"
+#include "GameAssets.h"
+#include "PlayerController.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "External/stb_image.h"
 
 #include <cstdint>
 #include <imgui.h>
-
-#include "GameAssets.h"
-#include "PlayerController.h"
 
 
 NOVA_DEFINE_APPLICATION_CLASS(GameApplication)
@@ -37,7 +36,7 @@ ApplicationConfiguration GameApplication::GetConfiguration() const
     ApplicationConfiguration config;
     config.windowWidth = 800;
     config.windowHeight = 600;
-    config.vsync = false;
+    config.vsync = true;
     config.applicationName = "Pirate Bomb";
     config.fullscreen = false;
     config.resizable = false;
@@ -64,7 +63,7 @@ void GameApplication::OnInit()
     LoadAnimation(TEX_PlayerDeadHit, ANM_PlayerDeadHit, 1, 6, 6, 58);
     LoadAnimation(TEX_PlayerDeadGround, ANM_PlayerDeadGround, 1, 4, 4, 58);
 
-    const auto constructScene = [this] -> Scene* {
+    const auto constructScene = [this] () {
         const RenderTarget* renderTarget = GetRenderTarget();
 
         Scene* scene = new Scene(this, "Test Scene");
@@ -103,28 +102,27 @@ void GameApplication::OnInit()
     sceneManager->LoadScene(constructScene());
 }
 
-void GameApplication::OnUpdate(float deltaTime)
+void GameApplication::OnUpdate(const float deltaTime)
 {
-    const auto& window = GetWindow().As<DesktopWindow>();
-    if (window->GetKeyDown(KeyCode::Space))
-    {
-        const Vector3 velocity = Vector3::Up * Math::Sqrt(2.0f * 9.81 * 1.0f);
-        box->SetLinearVelocity(velocity);
-    }
+    Application::OnUpdate(deltaTime);
+    const Ref<DesktopWindow> input = GetWindow().As<DesktopWindow>();
+    if (input->GetKeyDown(KeyCode::F11))
+        m_EnableGui = !m_EnableGui;
 }
-
-
 
 void GameApplication::OnGUI()
 {
-    DrawFps(GetDeltaTime(), 3.0f);
-    if (ImGui::Begin("Settings"))
+    if (m_EnableGui)
     {
-        DrawSpriteRenderer("Sprite Renderer", renderer);
-        DrawTransform("Transform", transform);
-        DrawBoxComponent("Box Component", box);
+        DrawFps(GetDeltaTime(), 3.0f);
+        if (ImGui::Begin("Settings"))
+        {
+            DrawSpriteRenderer("Sprite Renderer", renderer);
+            DrawTransform("Transform", transform);
+            DrawBoxComponent("Box Component", box);
+        }
+        ImGui::End();
     }
-    ImGui::End();
 }
 
 Ref<Texture> GameApplication::LoadTexture(const String& name, const StringView filepath)

@@ -17,4 +17,6 @@ public:
     Nova::Ref<Nova::SpriteAnimation> LoadSpriteAnimation(const Nova::String& name, const Nova::SpriteSheet& spriteSheet);
     void LoadTexture(GameAssets asset, Nova::StringView filepath);
     void LoadAnimation(GameAssets texture, GameAssets animation, uint32_t rows, uint32_t columns, uint32_t spriteCount, uint32_t spriteSize);
+private:
+    bool m_EnableGui = false;
 };

@@ -32,6 +32,13 @@ void PlayerController::OnUpdate(const float deltaTime)
     }
 
     const Vector3 targetVelocity = velocity + movementDir * m_Speed;
-    //const Vector3 smoothedVelocity = Vector3::Lerp(lastVelocity, targetVelocity, 1.0f - Math::Exp(-m_Acceleration * deltaTime));
-    m_PhysicsComponent->SetLinearVelocity(targetVelocity);
+    Vector3 smoothedVelocity = Vector3::Lerp(lastVelocity, targetVelocity, 1.0f - Math::Exp(-m_Acceleration * deltaTime));
+
+    if (m_Window->GetKeyDown(KeyCode::Space))
+    {
+        const Vector3 jumpVelocity = Vector3::Up * Math::Sqrt(2.0f * 9.81 * 1.0f);
+        smoothedVelocity += jumpVelocity;
+    }
+
+    m_PhysicsComponent->SetLinearVelocity(smoothedVelocity);
 }
