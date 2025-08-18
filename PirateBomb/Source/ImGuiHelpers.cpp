@@ -101,7 +101,7 @@ void DrawSpriteRenderer(const Nova::StringView name, Nova::SpriteRenderer* rende
     ImGui::PopID();
 }
 
-void DrawBoxComponent(Nova::StringView name, Nova::BoxComponent2D* box)
+void DrawBoxComponent2D(Nova::StringView name, Nova::BoxComponent2D* box)
 {
     if (!box) return;
     ImGui::PushID(box);
@@ -118,6 +118,28 @@ void DrawBoxComponent(Nova::StringView name, Nova::BoxComponent2D* box)
         float rotation = Nova::Math::Degrees(box->GetShapeRotation());
         if (ImGui::DragFloat("Rotation", &rotation, 0.01f, 0, 0, "%.2f"))
             box->SetShapeRotation(Nova::Math::Radians(rotation));
+        ImGui::TreePop();
+    }
+    ImGui::PopID();
+}
+
+void DrawPlaneComponent2D(Nova::StringView name, Nova::PlaneComponent2D* plane)
+{
+    if (!plane) return;
+    ImGui::PushID(plane);
+    if (ImGui::TreeNode(*name))
+    {
+        Nova::Vector2 position = plane->GetShapePosition();
+        if (ImGui::DragFloat2("Position", position.ValuePtr(), 0.01f, 0, 0, "%.2f"))
+            plane->SetShapePosition(position);
+
+        float width = plane->GetWidth();
+        if (ImGui::DragFloat("Width", &width, 0.01f, 0, 0, "%.2f"))
+            plane->SetWidth(width);
+
+        float rotation = Nova::Math::Degrees(plane->GetShapeRotation());
+        if (ImGui::DragFloat("Rotation", &rotation, 0.01f, 0, 0, "%.2f"))
+            plane->SetShapeRotation(Nova::Math::Radians(rotation));
 
         ImGui::TreePop();
     }

@@ -15,11 +15,12 @@
 #include "GameAssets.h"
 #include "PlayerController.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "External/stb_image.h"
 
 #include <cstdint>
 #include <imgui.h>
+
+#include "Rendering/DebugRenderer.h"
 
 
 NOVA_DEFINE_APPLICATION_CLASS(GameApplication)
@@ -30,6 +31,7 @@ using namespace Nova::Rendering;
 static Transform* transform = nullptr;
 static SpriteRenderer* renderer = nullptr;
 static BoxComponent2D* box = nullptr;
+static PlaneComponent2D* plane;
 
 ApplicationConfiguration GameApplication::GetConfiguration() const
 {
@@ -71,20 +73,22 @@ void GameApplication::OnInit()
         EntityHandle entity = scene->CreateEntity("Sprite");
         transform = entity->GetTransform();
         box = entity->AddComponent<BoxComponent2D>();
-        box->SetType(PhysicsBodyType::Dynamic);
-        box->SetGravityScale(1);
+        box->SetType(PhysicsBodyType::Static);
+        box->SetGravityScale(0);
         box->SetConstraints(PhysicsConstraintsFlagBits::Rotation);
+
 
         entity->AddComponent<PlayerController>();
 
         EntityHandle floor = scene->CreateEntity("Floor");
-        PlaneComponent2D* plane = floor->AddComponent<PlaneComponent2D>();
+        plane = floor->AddComponent<PlaneComponent2D>();
         plane->SetType(PhysicsBodyType::Static);
-        plane->SetBodyPosition({ 0.0f, -1, 0.0f});
 
+#if 0
         renderer = entity->AddComponent<SpriteRenderer>();
         renderer->SetPixelsPerUnit(58*2);
         renderer->SetSpriteAnimation(g_GameAssets[ANM_PlayerIdle]);
+#endif
 
         EntityHandle cameraEntity = scene->CreateEntity("Camera");
         cameraEntity->GetTransform()->SetPosition(Vector3(0.0f, 0.0f, 1.0f));
@@ -110,6 +114,11 @@ void GameApplication::OnUpdate(const float deltaTime)
         m_EnableGui = !m_EnableGui;
 }
 
+void GameApplication::OnDrawDebug()
+{
+    DebugRenderer::DrawCircle(Vector3::Zero, Quaternion::Identity, 1.0f, Color::Red);
+}
+
 void GameApplication::OnGUI()
 {
     if (m_EnableGui)
@@ -119,7 +128,8 @@ void GameApplication::OnGUI()
         {
             DrawSpriteRenderer("Sprite Renderer", renderer);
             DrawTransform("Transform", transform);
-            DrawBoxComponent("Box Component", box);
+            DrawBoxComponent2D("Box Component", box);
+            DrawPlaneComponent2D("Plane Component", plane);
         }
         ImGui::End();
     }

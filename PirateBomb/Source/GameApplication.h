@@ -11,6 +11,7 @@ public:
     Nova::ApplicationConfiguration GetConfiguration() const override;
     void OnInit() override;
     void OnUpdate(float deltaTime) override;
+    void OnDrawDebug() override;
     void OnGUI() override;
 
     Nova::Ref<Nova::Rendering::Texture> LoadTexture(const Nova::String& name, Nova::StringView filepath);
