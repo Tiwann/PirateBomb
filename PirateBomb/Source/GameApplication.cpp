@@ -14,13 +14,9 @@
 #include "Components/Physics/PlaneComponent2D.h"
 #include "GameAssets.h"
 #include "PlayerController.h"
-
 #include "External/stb_image.h"
-
 #include <cstdint>
 #include <imgui.h>
-
-#include "Rendering/DebugRenderer.h"
 
 
 NOVA_DEFINE_APPLICATION_CLASS(GameApplication)
@@ -70,11 +66,13 @@ void GameApplication::OnInit()
 
         Scene* scene = new Scene(this, "Test Scene");
         scene->OnInit();
+
         EntityHandle entity = scene->CreateEntity("Sprite");
         transform = entity->GetTransform();
         box = entity->AddComponent<BoxComponent2D>();
-        box->SetType(PhysicsBodyType::Static);
-        box->SetGravityScale(0);
+        box->SetBodyPosition(Vector3::Up * 100.0f);
+        box->SetType(PhysicsBodyType::Dynamic);
+        box->SetGravityScale(1.0f);
         box->SetConstraints(PhysicsConstraintsFlagBits::Rotation);
 
 
@@ -83,7 +81,10 @@ void GameApplication::OnInit()
         EntityHandle floor = scene->CreateEntity("Floor");
         plane = floor->AddComponent<PlaneComponent2D>();
         plane->SetType(PhysicsBodyType::Static);
+        plane->SetBodyPosition(Vector3::Down * 1.0f);
 
+        EntityHandle newEntity = scene->CreateEntity("New Entity");
+        newEntity->SetParent(entity.GetEntity());
 #if 0
         renderer = entity->AddComponent<SpriteRenderer>();
         renderer->SetPixelsPerUnit(58*2);
@@ -104,19 +105,18 @@ void GameApplication::OnInit()
 
     SceneManager* sceneManager = GetSceneManager();
     sceneManager->LoadScene(constructScene());
+
 }
 
 void GameApplication::OnUpdate(const float deltaTime)
 {
     Application::OnUpdate(deltaTime);
-    const Ref<DesktopWindow> input = GetWindow().As<DesktopWindow>();
-    if (input->GetKeyDown(KeyCode::F11))
+    if (const Ref<DesktopWindow> input = GetWindow().As<DesktopWindow>(); input->GetKeyDown(KeyCode::F11))
         m_EnableGui = !m_EnableGui;
 }
 
 void GameApplication::OnDrawDebug()
 {
-    DebugRenderer::DrawCircle(Vector3::Zero, Quaternion::Identity, 1.0f, Color::Red);
 }
 
 void GameApplication::OnGUI()
