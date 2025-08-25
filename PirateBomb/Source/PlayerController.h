@@ -16,6 +16,7 @@ public:
 
     void OnInit() override;
     void OnUpdate(float deltaTime) override;
+    void OnPhysicsUpdate(float deltaTime) override;
 
 private:
     Nova::Ref<Nova::DesktopWindow> m_Window = nullptr;

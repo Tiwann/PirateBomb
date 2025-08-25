@@ -70,9 +70,8 @@ void GameApplication::OnInit()
         EntityHandle entity = scene->CreateEntity("Sprite");
         transform = entity->GetTransform();
         box = entity->AddComponent<BoxComponent2D>();
-        box->SetBodyPosition(Vector3::Up * 100.0f);
         box->SetType(PhysicsBodyType::Dynamic);
-        box->SetGravityScale(1.0f);
+        box->SetGravityScale(1);
         box->SetConstraints(PhysicsConstraintsFlagBits::Rotation);
 
 
@@ -83,11 +82,9 @@ void GameApplication::OnInit()
         plane->SetType(PhysicsBodyType::Static);
         plane->SetBodyPosition(Vector3::Down * 1.0f);
 
-        EntityHandle newEntity = scene->CreateEntity("New Entity");
-        newEntity->SetParent(entity.GetEntity());
-#if 0
+#if 1
         renderer = entity->AddComponent<SpriteRenderer>();
-        renderer->SetPixelsPerUnit(58*2);
+        renderer->SetPixelsPerUnit(58);
         renderer->SetSpriteAnimation(g_GameAssets[ANM_PlayerIdle]);
 #endif
 
@@ -98,7 +95,7 @@ void GameApplication::OnInit()
         camera->SetDimensions(renderTarget->GetWidth(), renderTarget->GetHeight());
         camera->SetClipPlanes(0.001f, 1000.0f);
         camera->SetProjectionMode(CameraProjectionMode::Orthographic);
-        camera->SetOrthographicSize(300.0f);
+        camera->SetOrthographicSize(100);
 
         return scene;
     };
